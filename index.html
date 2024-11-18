@@ -13,7 +13,7 @@
             line-height: 1.8;
         }
         .container {
-            max-width: 500px;
+            max-width: 600px;
             height: 500px;
             margin: 40px auto;
             padding: 50px;
@@ -226,7 +226,7 @@ let timeUntilReset = 0; // 剩余时间直到重置（以毫秒为单位）
 // 更新发送次数显示
 function updateNotificationCountDisplay() {
     const displayElement = document.getElementById("notificationCountDisplay");
-    displayElement.textContent = `已发送通知次数：${notificationCount}/${maxNotificationsPerHour}`;
+    displayElement.textContent = `已发送微信通知次数：${notificationCount}/${maxNotificationsPerHour}`;
 }
 
 // 更新剩余时间显示
