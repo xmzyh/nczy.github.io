@@ -23,13 +23,18 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
         background: #fff;;
         }
+        button {
+            margin: 40px 0;
+            font-weight: bold;
+            color: #fff;
+        }
        .car-icon { font-size: 42px; margin-bottom: 20px; color: #8e44ad; }
         input[type="text"] {
             width: 100%;
             padding: 12px;
             font-size: 15px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: -15px;
             border: 1px solid #d0d7de;
         }
         .btna {
@@ -42,56 +47,49 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
+      
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             font-size:32px;
         }
         h3 {
             text-align: center;
-            margin-bottom: 20px;
-            font-size:20px;
+            margin-bottom: 18px;
+            font-size:14px;
         }
       textarea {
             width: 100%;
-            height: 100px;
+            height: 120px;
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 8px;
             resize: none;
             font-size: 16px;
             margin-bottom: -25px;
+            background: #f9f9f9;
         }
    .char-count {
             text-align: right;
             color: #666;
             font-size: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
              margin-right: 5px;
         }
     .message-area {
-            margin-bottom: -20px;
+            margin-bottom: -60px;
         }
         .templates {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
+            flex-direction: column;
+            margin-bottom: 20px;
         }
-        .templates button {
-            width: 22%;
+        .templates select {
             padding: 10px;
-            font-size: 12px;
-            background: #28a745;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+            font-size: 14px;
             border-radius: 6px;
-        }
-        .templates button:hover {
-            background: #218838;
+            border: 1px solid #ccc;
         }
         .action-buttons {
             display: flex;
@@ -112,6 +110,7 @@
         .notify-btn {
             background: linear-gradient(45deg, #00b09b, #96c93d);
             font-size: 18px;
+          margin-bottom: 10px;
 	    color: white;
         }
         .notify-btn:hover { 
@@ -120,6 +119,7 @@
         .call-btn {  
 	    background: linear-gradient(45deg, #5370e6, #8558e9);
                      font-size: 22px;
+          margin-bottom: 10px;
             color: white;
 	    display: none; } /* 默认隐藏拨打电话按钮 */
         .call-btn:hover {
@@ -127,13 +127,13 @@
             transform: translateY(-2px);}            
         .notification-count {
             text-align: center;
-            margin-bottom: 0px;
+            margin-bottom: 5px;
             font-size: 18px;
             color: #007bff;
         }
         .notification-counta {
             text-align: center;
-            font-size: 8px;
+            font-size: 9px;
             color: #007bff;
         }     
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; }
@@ -157,17 +157,20 @@
         <p id="errorMessage" style="color: red; display: none;">未找到该车牌号，请检查并重新输入。</p>
     </div>
  
-    <div class="container" id="notificationContainer" style="display: none;">
+ <div class="container" id="notificationContainer" style="display: none;">
     <h1>临时停车 🅿 请多关照</h1>
-	<h3 align="center">非常抱歉，阻碍到您的出行了<h3>
-          <div class="templates">
-        <button onclick="useTemplate('您好，有人需要您挪车，请及时赶来。')">默认模板</button>
-        <button onclick="useTemplate('您好，您的车辆阻碍他人通行，请尽快挪车，谢谢配合。')">礼貌模板</button>
-        <button onclick="useTemplate('情况紧急！情况紧急！请火速赶来挪车！')">紧急模板</button>
-        <button onclick="useTemplate('您的车辆停放时未完全关闭车窗。为避免雨水进入车内或丢失物品，请尽快检查并关闭车窗！')">关窗提醒</button>
-    </div>
+	<h3 align="center">您可以选择预设模板或自行输入内容</h3>
+<div class="templates">
+    <select id="templateSelect" onchange="useTemplateFromSelect()">
+        <option value="" disabled selected>点我选择通知模板</option>
+        <option value="您好，有人需要您挪车，请及时赶来。">默认模板</option>
+        <option value="您好，您的车辆阻碍他人通行，请尽快挪车，谢谢配合。">礼貌模板</option>
+        <option value="情况紧急！情况紧急！请火速赶来挪车！">紧急模板</option>
+        <option value="您的车辆停放时未完全关闭车窗。为避免雨水进入车内或丢失物品，请尽快检查并关闭车窗！">关窗提醒</option>
+    </select>
+</div>
     <div class="message-area" >
-        <textarea id="messageInput" maxlength="50" placeholder="请输入通知内容" oninput="updateCharCount()"></textarea>
+        <textarea id="messageInput" maxlength="50" placeholder="请点我输入通知内容" oninput="updateCharCount()"></textarea>
         <div id="charCount" class="char-count">0/50字</div>
     </div>
     <div class="action-buttons">
@@ -250,13 +253,11 @@
     "意外险",     // 与保险相关的词汇
     "医疗险"      // 与保险相关的词汇
 	]; // 违禁词列表
-    const maxNotificationsPerHour = 15; // 每小时最多发送通知次数
-    const intervalTime = 1 * 1000; // 每次通知间隔时间45秒
+    const maxNotificationsPerHour = 10; // 每小时最多发送通知次数
+    const intervalTime = 2 * 1000; // 每次通知间隔时间45秒
 
         let currentUIDs = [];
         let currentPhone = '';
-        let notifyCooldown = false;
-        let callCooldown = false;
 
     // 获取本地存储的发送次数和时间戳
 let notificationCount = 0; // 当前小时内的发送次数
@@ -293,7 +294,11 @@ function updateTimeUntilReset() {
     const secondsUntilReset = Math.floor((timeUntilReset % (1000 * 60)) / 1000);
     resetElement.textContent = `距下时段微信通知次数恢复剩余: ${minutesUntilReset}分钟${secondsUntilReset}秒`;
 }
-
+  //定义下拉框
+        function useTemplateFromSelect() {
+            const template = document.getElementById("templateSelect").value;
+            document.getElementById("messageInput").value = template; 
+        }
     // 更新通知字符数
     function updateCharCount() {
         const message = document.getElementById("messageInput").value;
@@ -301,20 +306,36 @@ function updateTimeUntilReset() {
         document.getElementById("charCount").textContent = `${count}/50字`;
     }
 
-    // 使用通知快捷模板
-    function useTemplate(template) {
-        document.getElementById("messageInput").value = template;
-        updateCharCount();
+// 使用选择的模板内容更新消息框
+function useTemplateFromSelect() {
+    const template = document.getElementById("templateSelect").value;
+    const messageInput = document.getElementById("messageInput");
+    
+    if (template) {
+        messageInput.value = template;  // 更新消息框内容
+        updateCharCount();  // 更新字符数
     }
-
+}
     // 检查通知违禁词
     function containsForbiddenWords(message) {
         return forbiddenWords.some(word => message.includes(word));
     }
 
-    // 发送通知
-    function notifyOwner() {
-        const message = document.getElementById("messageInput").value;
+// 发送通知的函数
+function notifyOwner() {
+    const messageInput = document.getElementById("messageInput");
+    const message = messageInput.value.trim();  // 获取并去除前后空格
+
+    // 如果消息为空，则提示用户填写内容
+    if (!message) {
+        alert("通知发送失败，您没有选择模板或输入任何通知内容。");
+        return;
+    }
+      // 检查网络连接
+    if (!navigator.onLine) {
+        alert("通知发送出错，请检查您的网络连接。");
+        return;
+    }
         // 违禁词检查
         if (containsForbiddenWords(message)) {
             alert("通知内容包含违禁词，无法发送");
@@ -346,11 +367,11 @@ function updateTimeUntilReset() {
         localStorage.setItem('lastNotificationTime', lastNotificationTime);
         localStorage.setItem('hourStartTime', hourStartTime);
     }
-        // 更新发送次数显示
-        updateNotificationCountDisplay();
+    // 更新发送次数显示
+    updateNotificationCountDisplay();
     // 页面加载完成后或发送通知后更新剩余时间
     updateTimeUntilReset();
-        // 发送通知逻辑
+        //  如果网络可用，继续发送通知逻辑
         fetch("https://wxpusher.zjiecode.com/api/send/message", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -366,18 +387,8 @@ function updateTimeUntilReset() {
       // 编辑框重置为空白
         document.getElementById("messageInput").value = '';   
         updateCharCount();
-      } else {
-        alert("通知发送失败，请输入通知内容。");
-      // 编辑框重置为空白
-        document.getElementById("messageInput").value = '';   
-        updateCharCount();
-      }
-    }).catch(error => {
-      console.error("Error sending notification:", error);
-      alert("通知发送出错，请检查网络连接。");
-      // 编辑框重置为空白
-        document.getElementById("messageInput").value = '';   
-        updateCharCount();
+  document.getElementById("templateSelect").value = '';
+      } 
     });
        // 检查是否达到显示电话号码的条件
         if (notificationCount >= maxNotificationsPerHour) {
