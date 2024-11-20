@@ -146,6 +146,23 @@
         .confirm-btn:hover { background: #218838; }
         .cancel-btn { background: #dc3545; color: white; }
         .cancel-btn:hover { background: #c82333; }
+.btn.disabled {
+    position: relative; /* Ensure the button is positioned relative for the overlay */
+    pointer-events: none; /* Disable clicking */
+}
+
+/* Create the overlay using the ::before pseudo-element */
+.btn.disabled::before {
+    content: ''; /* Required to create the pseudo-element */
+    position: absolute; /* Position the overlay over the button */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* 80% transparent gray */
+    pointer-events: none; /* Prevent the overlay from blocking interactions */
+    border-radius: inherit; /* Inherit the border radius of the button */
+}
     </style>
 </head>
 <body>
@@ -157,7 +174,7 @@
         <p id="errorMessage" style="color: red; display: none;">未找到该车牌号，请检查并重新输入。</p>
     </div>
  
- <div class="container" id="notificationContainer" style="display: none;">
+ <div class="container" id="notificationContainer" style="display:none;">
     <h1>临时停车 🅿 请多关照</h1>
 	<h3 align="center">您可以选择预设模板或自行输入内容</h3>
 <div class="templates">
@@ -253,7 +270,7 @@
     "意外险",     // 与保险相关的词汇
     "医疗险"      // 与保险相关的词汇
 	]; // 违禁词列表
-    const maxNotificationsPerHour = 10; // 每小时最多发送通知次数
+    const maxNotificationsPerHour = 100; // 每小时最多发送通知次数
     const intervalTime = 2 * 1000; // 每次通知间隔时间45秒
 
         let currentUIDs = [];
@@ -264,6 +281,7 @@ let notificationCount = 0; // 当前小时内的发送次数
 let lastNotificationTime = 0; // 上次发送通知的时间戳（当前小时内的）
 let hourStartTime = new Date().setHours(new Date().getHours(), 0, 0, 0); // 当前小时的开始时间戳
 let timeUntilReset = 0; // 剩余时间直到重置（以毫秒为单位）
+ let countdownInterval;  // 用来存储倒计时的定时器
 
 //车牌框代码
    function checkLicensePlate() {
@@ -371,6 +389,23 @@ function notifyOwner() {
     updateNotificationCountDisplay();
     // 页面加载完成后或发送通知后更新剩余时间
     updateTimeUntilReset();
+  
+    // 禁用通知按钮并开始倒计时
+    const notifyBtn = document.getElementById("notifyBtn");
+    notifyBtn.classList.add("disabled");  // Add disabled class for opacity mask
+    let countdownTime = 30;
+    notifyBtn.textContent = `请等待 ${countdownTime} 秒后再发送通知`;
+
+    countdownInterval = setInterval(() => {
+        countdownTime--;
+        notifyBtn.textContent = `请等待 ${countdownTime} 秒后再发送通知`;
+        if (countdownTime <= 0) {
+            clearInterval(countdownInterval);
+            notifyBtn.classList.remove("disabled");  // Remove the disabled class after countdown ends
+            notifyBtn.textContent = "微信一键通知车主📱";
+        }
+    }, 1000);
+  
         //  如果网络可用，继续发送通知逻辑
         fetch("https://wxpusher.zjiecode.com/api/send/message", {
             method: "POST",
